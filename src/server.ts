@@ -1,5 +1,5 @@
 
-import express, { Request } from 'express';
+import express, { NextFunction, Request } from 'express';
 
 import morgan from 'morgan';
 import cors from 'cors';
@@ -32,11 +32,29 @@ app.use(cors());
 
 
 app.get('/', (req, res) => {
-  res.send('Hello World');
+  throw new Error('Something went wrong');
 });
 
 app.use("/api/v1/user",  userRoute);
 app.use('/api',protect, pointROuter);
+
+interface Error {
+  status?: number;
+  message?: string;
+}
+
+interface ErrorRequest extends Request {
+  error?: Error;
+}
+
+app.use((err: Error, req: ErrorRequest, res: express.Response, next: NextFunction) => {
+  res.status(err.status || 500);
+  res.json({
+    error: {
+      message: err.message || 'Internal Server Error'
+    }
+  });
+});
 
 
 export default app;

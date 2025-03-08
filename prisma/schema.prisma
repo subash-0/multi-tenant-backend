@@ -27,11 +27,15 @@ model Product {
   id          String   @id @default(uuid())
   name        String   @db.VarChar(255)
   description String   @db.VarChar(255)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   belongToId  String
   belongTo    User     @relation(fields: [belongToId], references: [id])
   updates     Update[]
 
-  @@index([id,belongToId])
+  @@unique([id,belongToId])
 }
 
 enum UpdateStatus {
@@ -52,6 +56,7 @@ model Update {
   productId    String
   product      Product       @relation(fields: [productId], references: [id])
   updatePoints UpdatePoint[]
+  @@unique([id,productId])
 }
 
 model UpdatePoint {
@@ -61,8 +66,8 @@ model UpdatePoint {
   name      String @db.VarChar(255)
   description String
 
-
   updatedAt DateTime @updatedAt
   updateId  String
   update    Update   @relation(fields: [updateId], references: [id])
+  @@unique([id,updateId])
 }

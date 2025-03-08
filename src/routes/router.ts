@@ -1,42 +1,44 @@
 import { Router, Request } from 'express';
 import { body,oneOf,validationResult } from 'express-validator';
 import validator from '../modules/middleware';
+import { createProduct, deleteProduct, getOneProduct, getProducts, updateProduct } from '../handlers/products';
+import { createUpdate, deleteUpdate, getOneUpdate, getUpdate, updateUpdate } from '../handlers/update';
 
 const router = Router();
 
+const productValidationRules = [
+  body('name').isString(),
+  body('description').isString(),
+];
 //  proudcts routes
-router.get('/products', (req,res) => {
-    res.json({message: 'Hello World'});
-});
-router.get('/products/:id', () => {});
-router.put('/products/:id',body('name')?.isString(), validator,(req,res) => {
- 
-  });
-router.post('/products', () => {});
-router.delete('/products/:id', () => {});
+router.get('/products',getProducts);
+router.get('/products/:id', getOneProduct);
+router.put('/products/:id',body('name')?.isString(), validator,updateProduct);
+router.post('/products',productValidationRules, validator,createProduct);
+router.delete('/products/:id', deleteProduct);
 
 
 
 
 
 // UPdates
-router.get('/updates', () => {});
-router.get('/updates/:id', () => {});
+router.get('/updates', getUpdate);
+router.get('/updates/:id', getOneUpdate);
 
 router.put('/updates/:id', 
     body('title')?.optional(),
     body('body')?.optional(), 
     body('status')?.isIn(['IN_PROGRESS', 'SHIPPED', 'DEPRECATED']),
     body('version')?.optional(),
-    (req,res,next) => {
-      res.json({message: 'Hello World'});
-    }
+    updateUpdate
 );
 router.post('/updates',
   body('title')?.exists().isString(),
-  body('body')?.exists().isString(), 
-  () => {});
-router.delete('/updates/:id', () => {});
+  body('body')?.exists().isString(),
+  body('productId')?.exists().isString(), 
+  createUpdate
+);
+router.delete('/updates/:id', deleteUpdate);
 
 /**
  * update points
